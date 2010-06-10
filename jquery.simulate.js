@@ -42,6 +42,8 @@ $.extend($.simulate.prototype, {
 			return this.mouseEvent(type, options);
 		} else if (/^key(up|down|press)$/.test(type)) {
 			return this.keyboardEvent(type, options);
+		} else if(/^load|unload|abort|error|select|change|submit|reset|focus|blur|resize|scroll$/.test(type)) {
+			return this.htmlEvent(type, options);
 		}
 	},
 	mouseEvent: function(type, options) {
@@ -97,6 +99,23 @@ $.extend($.simulate.prototype, {
 		if ($.browser.msie || $.browser.opera) {
 			evt.keyCode = (e.charCode > 0) ? e.charCode : e.keyCode;
 			evt.charCode = undefined;
+		}
+		return evt;
+	},
+
+	htmlEvent: function(type, options) {
+		var evt;
+
+		var e = $.extend({
+			bubbles: true, cancelable: true
+		}, options);
+
+		if ($.isFunction(document.createEvent)) {
+			evt = document.createEvent("HTMLEvents");
+			evt.initEvent(type, e.bubbles, e.cancelable);
+		} else if (document.createEventObject) {
+			evt = document.createEventObject();
+			$.extend(evt, e);
 		}
 		return evt;
 	},
